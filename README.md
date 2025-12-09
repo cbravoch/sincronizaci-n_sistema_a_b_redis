@@ -144,6 +144,14 @@ docker exec system-a php artisan test
 
 # System B (Jest; sin pruebas activas actualmente, se ejecuta suite vacía)
 docker exec system-b npm test
+
+# Variables de entorno para pruebas de System B (.env.test)
+# Archivo en docker/system-b/.env.test (por defecto):
+# TEST_DB_HOST=db-b
+# TEST_DB_PORT=3306
+# TEST_DB_USER=user
+# TEST_DB_PASSWORD=pass
+# TEST_DB_NAME=system_b
 ```
 
 ## Configuración
