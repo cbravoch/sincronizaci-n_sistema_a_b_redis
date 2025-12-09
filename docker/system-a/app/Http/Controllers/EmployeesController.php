@@ -87,7 +87,7 @@ class EmployeesController extends Controller
             }
 
             OutboxHelper::createOutboxEvent(
-                'employee.store',
+                'employee.created',
                 $employee->id,
                 'employee',
                 $employee->version,
@@ -130,7 +130,7 @@ class EmployeesController extends Controller
         $departments = Departments::all();
         $skills = Skills::all();
         $employeeSkills = $employee->skills->pluck('id')->toArray();
-        
+
         return view('employees.edit', compact('employee', 'departments', 'skills', 'employeeSkills'));
     }
 
@@ -144,7 +144,7 @@ class EmployeesController extends Controller
     public function update(Request $request, $id)
     {
         $employee = Employees::findOrFail($id);
-        
+
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:employees,email,' . $id,
@@ -157,7 +157,7 @@ class EmployeesController extends Controller
         DB::beginTransaction();
 
         try {
-            
+
             $employee->update([
                 'name' => $request->name,
                 'email' => $request->email,
@@ -206,11 +206,11 @@ class EmployeesController extends Controller
     public function destroy($id)
     {
         $employee = Employees::findOrFail($id);
-        
+
         DB::beginTransaction();
 
         try {
-            
+
             $employee->skills()->detach();
             $employee->delete();
 
