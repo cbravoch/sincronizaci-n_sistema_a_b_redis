@@ -189,14 +189,19 @@ export async function handleEmployeeDeleted(event, trx) {
         }
 
         const id = employee.id;
-        const version = employee.version;
+        const version = Number(employee.version);
 
         const existing = await trx('employees').where({ id }).first();
         if (!existing) {
             return { ok: true };
         }
 
-        if (version <= existing.version) {
+        const existingVersion = Number(existing.version);
+        if (Number.isNaN(version)) {
+            return { skip: true, reason: 'invalid version' };
+        }
+
+        if (!Number.isNaN(existingVersion) && version < existingVersion) {
             return { skip: true, reason: 'version outdated' };
         }
 
