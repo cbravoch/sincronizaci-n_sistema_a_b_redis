@@ -1,0 +1,108 @@
+services:
+
+  # -------------------- SISTEMA A (Laravel) --------------------
+  system-a:
+    build:
+      context: ./docker/system-a
+    container_name: system-a
+    restart: unless-stopped
+    volumes:
+      - ./docker/system-a:/var/www/html:delegated
+    depends_on:
+      - db-a
+      - redis
+    networks:
+      - sync-net
+
+  system-a-nginx:
+    image: nginx:stable
+    container_name: system-a-nginx
+    volumes:
+      - ./docker/system-a:/var/www/html
+      - ./docker/system-a/default.conf:/etc/nginx/conf.d/default.conf
+      - ./docker/system-a/nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - "8000:80"
+    depends_on:
+      - system-a
+    networks:
+      - sync-net
+
+  # -------------------- BASE DE DATOS A --------------------
+  db-a:
+    image: mysql:8.0
+    ports:
+      - "3307:3306"
+    container_name: db-a
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: system_a
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pass
+    volumes:
+      - db-a-data:/var/lib/mysql
+    networks:
+      - sync-net
+
+  # -------------------- REDIS (stream + PEL) --------------------
+  redis:
+    image: redis:7
+    container_name: redis
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - sync-net
+
+  redis-ui:
+    image: rediscommander/redis-commander
+    container_name: redis-ui
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    ports:
+      - "8081:8081"
+    networks:
+      - sync-net
+
+  # -------------------- SISTEMA B (Node.js consumer) --------------------
+  system-b:
+    build:
+      context: ./docker/system-b
+    container_name: system-b
+    restart: unless-stopped
+    volumes:
+      - /usr/src/app/node_modules
+      - ./docker/system-b:/usr/src/app
+    depends_on:
+      - db-b
+      - redis
+    networks:
+      - sync-net
+
+  # -------------------- BASE DE DATOS B --------------------
+  db-b:
+    image: mysql:8.0
+    ports:
+      - "3308:3306"
+    container_name: db-b
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: system_b
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pass
+    volumes:
+      - db-b-data:/var/lib/mysql
+    networks:
+      - sync-net
+
+networks:
+  sync-net:
+
+volumes:
+  db-a-data:
+  db-b-data:
+  redis-data:

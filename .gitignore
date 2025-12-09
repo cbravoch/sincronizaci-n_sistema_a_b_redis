@@ -1,0 +1,31 @@
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Env files
+.env
+.env.*
+!**/.env.example
+
+# Logs and caches
+*.log
+*.cache
+storage
+docker/system-a/storage
+docker/system-a/bootstrap/cache
+docker/system-a/.phpunit.result.cache
+
+# Dependencies
+docker/system-a/vendor
+docker/system-b/node_modules
+
+# Package manager debris
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# IDE/editor
+.vscode/
+.idea/
+.fleet/
+.history/
