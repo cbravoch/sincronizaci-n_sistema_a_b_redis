@@ -105,6 +105,29 @@ docker run --rm -v "${PWD}:/app" -w /app python:3-slim bash -lc \
    --db-b-host host.docker.internal --db-b-port 3308"
 ```
 
+### Pruebas rápidas (funcionales)
+```bash
+# Crear empleado de prueba (API de test)
+curl -X POST http://localhost:8000/api/test/department-created-1000 \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Depto QA","cost_center_code":"CCQA1"}'
+
+# Crear empleado vía interfaz web: http://localhost:8000/employees/create
+# Editar/eliminar: http://localhost:8000/employees/{id}/edit
+```
+
+### Limpieza de datos de prueba
+```bash
+# Borrar departamentos de prueba en A y B (prefijo TEST-CC o Perf Dept)
+docker exec db-a mysql -uuser -ppass -D system_a -e "DELETE FROM departments WHERE name LIKE 'Perf Dept %' OR cost_center_code LIKE 'TEST-CC%';"
+docker exec db-b mysql -uuser -ppass -D system_b -e "DELETE FROM departments WHERE name LIKE 'Perf Dept %' OR cost_center_code LIKE 'TEST-CC%';"
+# Vaciar tablas de eventos/outbox si es necesario
+docker exec db-a mysql -uuser -ppass -D system_a -e "TRUNCATE outbox;"
+docker exec db-b mysql -uuser -ppass -D system_b -e "TRUNCATE processed_events; TRUNCATE sync_logs; TRUNCATE event_errors; TRUNCATE sync_offsets;"
+# Limpiar mensajes pendientes en Redis (dejar stream vacío)
+docker exec redis redis-cli FLUSHALL
+```
+
 ### System B (Node.js)
 ```bash
 # Acceder al contenedor
@@ -112,6 +135,15 @@ docker exec -it system-b sh
 
 # Instalar dependencias (si es necesario)
 docker exec system-b npm install
+```
+
+### Pruebas unitarias
+```bash
+# System A (PHPUnit)
+docker exec system-a php artisan test
+
+# System B (Jest; sin pruebas activas actualmente, se ejecuta suite vacía)
+docker exec system-b npm test
 ```
 
 ## Configuración
