@@ -159,6 +159,9 @@ class SkillsController extends Controller
 
         try {
 
+            $skill->version = $skill->version + 1;
+            $skill->save();
+
             $skill->employees()->detach();
             $skill->delete();
             

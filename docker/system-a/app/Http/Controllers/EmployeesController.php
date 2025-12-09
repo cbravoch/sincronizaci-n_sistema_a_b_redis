@@ -53,6 +53,7 @@ class EmployeesController extends Controller
             'email' => 'required|email|unique:employees,email',
             'departments_id' => 'required|exists:departments,id',
             'position' => 'required|string|max:255',
+            'hire_date' => 'nullable|date',
             'skills' => 'array',
             'skills.*' => 'exists:skills,id'
         ]);
@@ -73,6 +74,7 @@ class EmployeesController extends Controller
                 'email' => $request->email,
                 'departments_id' => $request->departments_id,
                 'position' => $request->position,
+                'hire_date' => $request->hire_date,
                 'version' => 1,
             ]);
 
@@ -150,6 +152,7 @@ class EmployeesController extends Controller
             'email' => 'required|email|unique:employees,email,' . $id,
             'departments_id' => 'required|exists:departments,id',
             'position' => 'required|string|max:255',
+            'hire_date' => 'nullable|date',
             'skills' => 'array',
             'skills.*' => 'exists:skills,id'
         ]);
@@ -163,6 +166,7 @@ class EmployeesController extends Controller
                 'email' => $request->email,
                 'departments_id' => $request->departments_id,
                 'position' => $request->position,
+                'hire_date' => $request->hire_date,
                 'version' => $employee->version + 1,
             ]);
 
@@ -170,7 +174,8 @@ class EmployeesController extends Controller
                 Log::info('EmployeesController@update - Sincronizando habilidades', [
                     'employee_id' => $employee->id,
                     'skills' => $request->input('skills'),
-                ]);\n                $employee->skills()->syncWithPivotValues($request->skills, ['level' => 1]);
+                ]);
+                $employee->skills()->syncWithPivotValues($request->skills, ['level' => 1]);
             } else {
                 Log::info('EmployeesController@update - Sin habilidades en el request, se desasocian todas');
                 $employee->skills()->detach();
@@ -234,4 +239,3 @@ class EmployeesController extends Controller
         }
     }
 }
-

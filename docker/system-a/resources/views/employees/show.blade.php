@@ -28,6 +28,10 @@
                         <th>Posición:</th>
                         <td>{{ $employee->position }}</td>
                     </tr>
+                    <tr>
+                        <th>Fecha de contratación:</th>
+                        <td>{{ optional($employee->hire_date)->format('Y-m-d') ?? 'N/A' }}</td>
+                    </tr>
                 </table>
             </div>
             

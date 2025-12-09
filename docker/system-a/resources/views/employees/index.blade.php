@@ -18,6 +18,7 @@
                 <th>Email</th>
                 <th>Departamento</th>
                 <th>Posición</th>
+                <th>Fecha de contratación</th>
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -28,6 +29,7 @@
                     <td>{{ $employee->email }}</td>
                     <td>{{ $employee->department->name ?? 'N/A' }}</td>
                     <td>{{ $employee->position }}</td>
+                    <td>{{ optional($employee->hire_date)->format('Y-m-d') ?? 'N/A' }}</td>
                     <td>
                         <a href="{{ route('employees.show', $employee->id) }}" class="btn btn-sm btn-info">
                             <i class="bi bi-eye"></i>

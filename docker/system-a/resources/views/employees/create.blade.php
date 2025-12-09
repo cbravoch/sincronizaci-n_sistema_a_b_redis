@@ -59,6 +59,17 @@
             </div>
 
             <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="hire_date" class="form-label">Fecha de contratación</label>
+                    <input type="date" class="form-control @error('hire_date') is-invalid @enderror" 
+                           id="hire_date" name="hire_date" value="{{ old('hire_date') }}">
+                    @error('hire_date')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+
+            <div class="row">
                 <div class="col-md-12 mb-3">
                     <label class="form-label">Habilidades</label>
                     <select class="form-select @error('skills') is-invalid @enderror" 

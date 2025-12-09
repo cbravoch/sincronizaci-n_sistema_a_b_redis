@@ -79,12 +79,11 @@ export async function updateSyncOffset(stream, id) {
 export async function saveEventError(trxOrKnex, { event_id, event_type, stream_id, payload, error }) {
     const errorData = {
         event_id,
-        event_type,
-        stream_id,
         payload: JSON.stringify(payload || {}),
-        error: error?.message || String(error),
-        stack_trace: error?.stack,
-        created_at: new Date()
+        error_message: error?.message || String(error),
+        retries: 0,
+        created_at: new Date(),
+        resolved: false,
     };
 
     try {

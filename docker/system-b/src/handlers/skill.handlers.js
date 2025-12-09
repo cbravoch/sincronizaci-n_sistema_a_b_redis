@@ -129,13 +129,18 @@ export async function handleSkillDeleted(event, trx) {
         const existing = await trx("skills").where({ id }).first();
 
         if (existing) {
-            const existingVersion = existing.version;
-            const incomingVersion = String(version);
+            const existingVersion = Number(existing.version);
+            const incomingVersion = Number(version);
 
-            if (incomingVersion <= String(existingVersion)) {
+            if (Number.isNaN(incomingVersion)) {
+                return { skip: true, reason: "invalid version" };
+            }
+
+            if (incomingVersion < existingVersion) {
                 return { skip: true, reason: "version outdated" };
             }
 
+            await trx("employee_skills").where({ skill_id: id }).delete();
             await trx("skills").where({ id }).delete();
         }
 

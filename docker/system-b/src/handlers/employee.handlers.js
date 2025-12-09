@@ -11,12 +11,14 @@ export async function handleEmployeeCreated(event, trx) {
         id,
         name,
         email,
-        hire_date,
         position,
         departments_id,
         version,
-        is_active = true
+        is_active
     } = payload;
+
+    const hireDate = payload.hire_date ? String(payload.hire_date).split('T')[0] : null;
+    const isActive = is_active !== undefined ? Boolean(Number(is_active)) : true;
 
     if (departments_id) {
         const departmentExists = await trx("departments")
@@ -39,24 +41,24 @@ export async function handleEmployeeCreated(event, trx) {
         await trx("employees").where({ id }).update({
             name,
             email,
-            hire_date,
+            hire_date: hireDate,
             position,
             departments_id, 
             updated_at: new Date(),
             version,
-            is_active: is_active !== undefined ? is_active : true
+            is_active: isActive
         });
     } else {
         await trx("employees").insert({
             id,
             name,
             email,
-            hire_date,
+            hire_date: hireDate,
             position,
             departments_id, 
             updated_at: new Date(),
             version,
-            is_active: is_active !== undefined ? is_active : true,
+            is_active: isActive,
             deleted_at: null
         });
     }
@@ -97,6 +99,8 @@ export async function handleEmployeeUpdated(event, trx) {
 
         const id = payload.id;
         const version = payload.version;
+        const hireDate = payload.hire_date ? String(payload.hire_date).split('T')[0] : null;
+        const isActive = payload.is_active !== undefined ? Boolean(Number(payload.is_active)) : undefined;
 
         let departments_id = payload.departments_id ?? null;
         if (departments_id !== null && departments_id !== undefined) {
@@ -121,10 +125,10 @@ export async function handleEmployeeUpdated(event, trx) {
             await trx('employees').where({ id }).update({
                 name: payload.name,
                 email: payload.email,
-                hire_date: payload.hire_date || null,
+                hire_date: hireDate,
                 position: payload.position || null,
                 departments_id,
-                is_active: payload.is_active !== undefined ? !!payload.is_active : existing.is_active,
+                is_active: isActive !== undefined ? isActive : existing.is_active,
                 deleted_at: payload.deleted_at || existing.deleted_at,
                 updated_at: new Date(),
                 version,
@@ -134,10 +138,10 @@ export async function handleEmployeeUpdated(event, trx) {
                 id,
                 name: payload.name,
                 email: payload.email,
-                hire_date: payload.hire_date || null,
+                hire_date: hireDate,
                 position: payload.position || null,
                 departments_id,
-                is_active: payload.is_active !== undefined ? !!payload.is_active : true,
+                is_active: isActive !== undefined ? isActive : true,
                 version,
                 updated_at: new Date(),
                 deleted_at: payload.deleted_at || null,

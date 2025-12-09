@@ -24,6 +24,10 @@ class Employees extends Model
         'is_active'
     ];
 
+    protected $casts = [
+        'hire_date' => 'date',
+    ];
+
     public $timestamps = false;
 
     public function departments()
